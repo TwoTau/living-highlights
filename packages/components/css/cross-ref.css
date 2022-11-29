@@ -1,0 +1,31 @@
+.cross-ref {
+  color: var(--ref-color);
+  font-weight: var(--ref-weight);
+  text-decoration: var(--ref-decoration);
+  cursor: pointer;
+}
+
+.cross-ref:hover {
+  color: var(--ref-color-hover);
+}
+
+.cross-ref.unresolved,
+.cross-ref.unresolved:hover {
+  color: var(--ref-color-error);
+}
+
+.cross-ref.sec.full::before {
+  content: var(--section-prefix);
+}
+
+.cross-ref.fig.full::before {
+  content: var(--figure-prefix);
+}
+
+.cross-ref.tbl.full::before {
+  content: var(--table-prefix);
+}
+
+.cross-ref.eqn.full::before {
+  content: var(--equation-prefix);
+}

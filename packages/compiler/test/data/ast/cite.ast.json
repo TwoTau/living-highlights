@@ -1,0 +1,204 @@
+{
+  "metadata": {
+    "author": [
+      {
+        "name": "Living Papers Team",
+        "org": "University of Washington"
+      }
+    ],
+    "bibliography": "references.bib",
+    "title": "Citation Test"
+  },
+  "article": {
+    "type": "component",
+    "name": "article",
+    "children": [
+      {
+        "type": "component",
+        "name": "p",
+        "children": [
+          {
+            "type": "textnode",
+            "value": "Did you read "
+          },
+          {
+            "type": "component",
+            "name": "citeref",
+            "properties": {
+              "key": {
+                "type": "value",
+                "value": "Scott:1985"
+              },
+              "mode": {
+                "type": "value",
+                "value": "inline-author"
+              }
+            }
+          },
+          {
+            "type": "textnode",
+            "value": "? It was part of the reading list "
+          },
+          {
+            "type": "component",
+            "name": "citelist",
+            "children": [
+              {
+                "type": "component",
+                "name": "citeref",
+                "properties": {
+                  "key": {
+                    "type": "value",
+                    "value": "Scott:1985"
+                  }
+                }
+              },
+              {
+                "type": "component",
+                "name": "citeref",
+                "properties": {
+                  "key": {
+                    "type": "value",
+                    "value": "Jones:1983"
+                  }
+                }
+              },
+              {
+                "type": "component",
+                "name": "citeref",
+                "properties": {
+                  "key": {
+                    "type": "value",
+                    "value": "Silverman:1982"
+                  }
+                }
+              },
+              {
+                "type": "component",
+                "name": "citeref",
+                "properties": {
+                  "key": {
+                    "type": "value",
+                    "value": "Wand:1994"
+                  }
+                }
+              },
+              {
+                "type": "component",
+                "name": "citeref",
+                "properties": {
+                  "key": {
+                    "type": "value",
+                    "value": "Wells:1986"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "textnode",
+            "value": "."
+          }
+        ]
+      },
+      {
+        "type": "component",
+        "name": "p",
+        "children": [
+          {
+            "type": "textnode",
+            "value": "I liked "
+          },
+          {
+            "type": "component",
+            "name": "citeref",
+            "properties": {
+              "key": {
+                "type": "value",
+                "value": "doi:10.1145/3242587.3242600"
+              },
+              "mode": {
+                "type": "value",
+                "value": "inline-author"
+              }
+            }
+          },
+          {
+            "type": "textnode",
+            "value": ", which should be the same as "
+          },
+          {
+            "type": "component",
+            "name": "citelist",
+            "children": [
+              {
+                "type": "component",
+                "name": "citeref",
+                "properties": {
+                  "key": {
+                    "type": "value",
+                    "value": "s2id:4fca64e6dc4e803d3ed904c04c6845a9e6adc53e"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "textnode",
+            "value": " and "
+          },
+          {
+            "type": "component",
+            "name": "citelist",
+            "children": [
+              {
+                "type": "component",
+                "name": "citeref",
+                "properties": {
+                  "key": {
+                    "type": "value",
+                    "value": "s2id:52037222"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "textnode",
+            "value": "."
+          }
+        ]
+      },
+      {
+        "type": "component",
+        "name": "p",
+        "children": [
+          {
+            "type": "textnode",
+            "value": "We should also handle unresolved citations "
+          },
+          {
+            "type": "component",
+            "name": "citelist",
+            "children": [
+              {
+                "type": "component",
+                "name": "citeref",
+                "properties": {
+                  "key": {
+                    "type": "value",
+                    "value": "badcite"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "textnode",
+            "value": "."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "metadata": {
+    "title": "Multi-Way Input Binding"
+  },
+  "article": {
+    "type": "component",
+    "name": "article",
+    "children": [
+      {
+        "type": "component",
+        "name": "p",
+        "children": [
+          {
+            "type": "textnode",
+            "value": "Variable: "
+          },
+          {
+            "type": "component",
+            "name": "code",
+            "children": [
+              {
+                "type": "textnode",
+                "value": "js x = 128"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "component",
+        "name": "p",
+        "children": [
+          {
+            "type": "textnode",
+            "value": "Drag me: "
+          },
+          {
+            "type": "component",
+            "name": "range-text",
+            "properties": {
+              "min": {
+                "type": "value",
+                "value": "0"
+              },
+              "max": {
+                "type": "value",
+                "value": "255"
+              },
+              "step": {
+                "type": "value",
+                "value": "1"
+              },
+              "bind": {
+                "type": "value",
+                "value": "x"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "component",
+        "name": "p",
+        "children": [
+          {
+            "type": "textnode",
+            "value": "Or me: "
+          },
+          {
+            "type": "component",
+            "name": "range-text",
+            "properties": {
+              "min": {
+                "type": "value",
+                "value": "0"
+              },
+              "max": {
+                "type": "value",
+                "value": "255"
+              },
+              "step": {
+                "type": "value",
+                "value": "1"
+              },
+              "bind": {
+                "type": "value",
+                "value": "x"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "component",
+        "name": "codeblock",
+        "properties": {
+          "class": {
+            "type": "value",
+            "value": "js"
+          },
+          "bind": {
+            "type": "value",
+            "value": "x"
+          }
+        },
+        "children": [
+          {
+            "type": "textnode",
+            "value": "viewof a = Inputs.range([0, 255], {step: 1})"
+          }
+        ]
+      },
+      {
+        "type": "component",
+        "name": "p",
+        "children": [
+          {
+            "type": "component",
+            "name": "code",
+            "properties": {
+              "bind": {
+                "type": "value",
+                "value": "x"
+              }
+            },
+            "children": [
+              {
+                "type": "textnode",
+                "value": "js viewof b = Inputs.range([0, 255], {step: 1})"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "component",
+        "name": "p",
+        "children": [
+          {
+            "type": "component",
+            "name": "link",
+            "properties": {
+              "class": {
+                "type": "value",
+                "value": "action"
+              },
+              "click": {
+                "type": "event",
+                "value": "x = 0"
+              }
+            },
+            "children": [
+              {
+                "type": "textnode",
+                "value": "Reset"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

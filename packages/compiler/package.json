@@ -1,0 +1,35 @@
+{
+  "name": "@living-papers/compiler",
+  "description": "Authoring tools for scholarly communication.",
+  "version": "0.0.6",
+  "license": "BSD-3-Clause",
+  "repository": "uwdata/living-papers",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint 'src/**/*.js' 'test/**/*.js'",
+    "test": "mocha --timeout 10000 'test/**/*-test.js'",
+    "prepublishOnly": "npm run test & npm run lint"
+  },
+  "dependencies": {
+    "@living-papers/ast": "^0.0.6",
+    "@living-papers/components": "^0.0.6",
+    "@living-papers/html-templates": "^0.0.6",
+    "@living-papers/latex-templates": "^0.0.6",
+    "@living-papers/runtime": "^0.0.6",
+    "@living-papers/runtime-compiler": "^0.0.6",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-replace": "^5.0.0",
+    "@uwdata/file-cache": "0.0.1",
+    "citation-js": "^0.5.7",
+    "clean-css": "^5.3.1",
+    "mustache": "^4.2.0",
+    "node-fetch": "^3.2.10",
+    "puppeteer": "^14.1.0",
+    "rollup": "^2.79.1",
+    "rollup-plugin-bundle-size": "^1.0.3",
+    "rollup-plugin-minify-html-literals": "^1.2.6",
+    "rollup-plugin-terser": "^7.0.2"
+  }
+}

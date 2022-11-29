@@ -1,0 +1,11 @@
+.note {
+	font-style: italic;
+}
+
+.inline-note .note::before {
+	content: attr(data-number);
+	position: absolute;
+	right: var(--margin-width);
+	padding-left: 1ex;
+	padding-right: 1ex;
+}

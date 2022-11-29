@@ -1,0 +1,21 @@
+{
+  "name": "@living-papers/runtime",
+  "description": "Living Papers reactive runtime.",
+  "version": "0.0.6",
+  "license": "BSD-3-Clause",
+  "repository": "uwdata/living-papers",
+  "main": "dist/runtime.js",
+  "module": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "rollup -c",
+    "lint": "eslint 'src/**/*.js' 'test/**/*.js'",
+    "pretest": "npm run build",
+    "test": "mocha 'test/**/*-test.js'",
+    "prepublishOnly": "npm run test && npm run lint"
+  },
+  "dependencies": {
+    "@observablehq/runtime": "^4.25.0"
+  }
+}
