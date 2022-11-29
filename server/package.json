@@ -1,0 +1,24 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Server to store Living Papers tweets",
+  "main": "index.js",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TwoTau/living-highlights.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TwoTau/living-highlights/issues"
+  },
+  "homepage": "https://github.com/TwoTau/living-highlights#readme",
+  "dependencies": {
+    "twitter-api-v2": "^1.12.9"
+  }
+}

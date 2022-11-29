@@ -25,12 +25,6 @@
         "css": "css/cell-view.css"
       },
       {
-        "name": "annotation-thread",
-        "import": "AnnotationThread",
-        "file": "src/annotation-thread.js",
-        "css": "css/annotation-thread.css"
-      },
-      {
         "name": "cite-ref",
         "import": "CiteRef",
         "file": "src/cite-ref.js",

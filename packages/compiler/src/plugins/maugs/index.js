@@ -36,8 +36,6 @@ export default function (ast) {
     .sort((b, a) => a.symbol.length - b.symbol.length)
     .map((d, i) => ({ ...d, id: d.id || i}));
   
-  console.log('IDs =\n', [...new Set(definitions.map(d => d.id))].join('\n'));
-
   definitions = JSON.stringify(definitions);
 
   visitNodes(ast, (node) => {

@@ -13,6 +13,15 @@
     "predeploy": "rimraf ../../docs",
     "deploy": "cp build ../../docs -r"
   },
+  "living-papers": {
+    "components": [
+      {
+        "name": "annotation-thread",
+        "file": "src/annotation-thread.js",
+        "css": "src/annotation-thread.css"
+      }
+    ]
+  },
   "devDependencies": {
     "@living-papers/cli": "^0.0.5",
     "gh-pages": "^4.0.0",

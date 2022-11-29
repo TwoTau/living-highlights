@@ -1,26 +1,52 @@
 import { html } from 'lit';
-import { ArticleElement } from './article-element.js';
+import { ArticleElement } from '@living-papers/components';
+import { generateFragment } from './fragment-generation-utils';
 
-export class AnnotationThread extends ArticleElement {
+// used for click debouncing
+let lastOpenedTweet = 0;
+
+export default class AnnotationThread extends ArticleElement {
     constructor() {
         super();
         document.addEventListener('keydown', this.keyDown);
     }
 
     keyDown(event) {
-        if (event.key == 'h' && window.getSelection().toString()) {
-            let annoTray = this.querySelector('.anno-tray');
-            annoTray.appendChild(createThread());
-            let selectedText = getSafeRanges(window.getSelection().getRangeAt(0));
-            for (let i = 0; i < selectedText.length; i++) {
-                let span = document.createElement("span");
-                span.style.backgroundColor = "yellow";
-                selectedText[i].surroundContents(span);
+        const selection = window.getSelection();
+        if (event.key !== 'h' && event.key !== 't' || !selection.toString()) {
+            return;
+        }
+        event.stopPropagation();
+        let selectedText = getSafeRanges(selection.getRangeAt(0));
+        const intentUrl = createTweetIntentUrl(selectedText, selection, window.location.href);
+
+        function makeTweet() {
+            // debounce
+            const now = new Date().getTime();
+            if (now - lastOpenedTweet > 200) {
+                lastOpenedTweet = now;
+                window.open(intentUrl, "_blank");
             }
-        } 
+        }
+
+        this.querySelector('.anno-tray').appendChild(createThread());
+        for (let i = 0; i < selectedText.length; i++) {
+            let span = document.createElement("span");
+            span.classList.add("annotation-highlight");
+            selectedText[i].surroundContents(span);
+
+            span.addEventListener('click', makeTweet);
+        }
+
+        // clear selection
+        selection.removeAllRanges();
+
+        if (event.key === 't') {
+            makeTweet();
+        }
     }
 
-    openTab(){
+    openTab() {
         let annotation = this.querySelector('.anno');
         if (!annotation.open) {
             annotation.open = true;
@@ -34,55 +60,46 @@ export class AnnotationThread extends ArticleElement {
     render() {
         return html`<div class='anno'>
             <div class='anno-tray'></div>
-            <div class='anno-button' @click=${this.openTab}></div>
+            <div class='anno-button' @click=${this.openTab}>tweets</div>
         </div>`
     }
+}
+
+function createTweetIntentUrl(text, selection, url) {
+    const result = generateFragment(selection);
+
+    if (result.status === 0) {
+        const fragment = result.fragment;
+        const prefix = fragment.prefix ?
+            `${encodeURIComponent(fragment.prefix)}-,` :
+            '';
+        const suffix = fragment.suffix ?
+            `,-${encodeURIComponent(fragment.suffix)}` :
+            '';
+        const textStart = encodeURIComponent(fragment.textStart);
+        const textEnd = fragment.textEnd ?
+            `,${encodeURIComponent(fragment.textEnd)}` :
+            '';
+
+        url += '#:~:text=' + prefix + textStart + textEnd + suffix;
+    }
+
+    text = `"${text}"`;
+
+    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
 }
 
 function createThread() {
     let threadCont = document.createElement("div");
     let annoThread = document.createElement("div");
-    let counter = document.createElement("p");
 
     threadCont.classList.add('thread-cont');
-    counter.classList.add('counter');
     annoThread.classList.add('anno-thread');
 
-    threadCont.addEventListener('mousedown', (e, t) => expand(e, threadCont))
-    annoThread.addEventListener('mousedown', (e, t) => appendReply(e, threadCont));
-
-    counter.textContent = '0 replies';
     annoThread.textContent = window.getSelection().toString();
     threadCont.appendChild(annoThread);
-    threadCont.appendChild(counter);
 
     return threadCont;
-}
-
-function appendReply(event, t) {
-    let repl = document.createElement("div");
-    repl.classList.add('reply');
-    repl.textContent = '...';
-    let replCont = document.createElement("div");
-    replCont.classList.add('reply-cont');
-    replCont.appendChild(repl);
-    repl.addEventListener('mousedown', (e, t) => appendReply(e, replCont));
-    t.appendChild(replCont);
-    if (event.target.className != 'anno-thread') {
-        event.stopImmediatePropagation();
-    }
-}
-
-function expand(event, t) {
-    if (!t.open) {
-        t.open = true;
-        t.style.height = '1000px';
-        t.style.overflow = 'auto';
-    } else {
-        t.open = false;
-        t.style.height = '150px';
-        t.style.overflow = 'hidden';
-    }
 }
 
 //

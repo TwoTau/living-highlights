@@ -1,0 +1,64 @@
+.anno-tray {
+    width: 420px;
+    overflow-y: auto;
+    height: 100vh;
+    background-color: rgba(128, 128, 128, 0.3);
+    backdrop-filter: blur(5px);
+
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    gap: 24px;
+}
+
+.thread-cont {
+    transition: height 900ms cubic-bezier(.05, .4, .25, .95);
+}
+
+.anno-thread {
+    background-color: whitesmoke;
+    border-radius: 4px;
+    padding: 10px;
+
+    max-height: 200px;
+	overflow-y: auto;
+}
+
+.anno-thread > p {
+    margin: 0;
+}
+
+.anno-button {
+    top: calc(50vh - 16px);
+	right: 360px;
+	position: absolute;
+	width: 150px;
+	background: #d9d9d9;
+	border-radius: 0 0 12px 12px;
+	cursor: pointer;
+
+    color: black;
+	font-size: 1.4em;
+	transform: rotate(90deg);
+	text-align: center;
+}
+
+.anno {
+    top: 0;
+    z-index: 99;
+    right: -420px;
+    position: fixed;
+    transition: transform 900ms cubic-bezier(.05, .4, .25, .95);
+}
+
+.annotation-highlight {
+    background: #ffff44;
+    cursor: pointer;
+    transition: background 0.1s ease-out;
+}
+
+.annotation-highlight:hover {
+    background: #ffdf2b;
+    padding: 2px;
+    margin: 0 -2px;
+}
