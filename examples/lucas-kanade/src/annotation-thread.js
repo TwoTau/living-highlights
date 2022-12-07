@@ -118,7 +118,7 @@ function createTweetIntentUrl(text, selection, url) {
         url += '#:~:text=' + prefix + textStart + textEnd + suffix;
     }
 
-    text = `"${text}"`;
+    text = `"${text}"\n`;
 
     return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
 }
