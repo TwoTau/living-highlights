@@ -1,6 +1,7 @@
 import { html } from 'lit';
 import { ArticleElement } from '@living-papers/components';
 import { generateFragment } from './fragment-generation-utils';
+import { markRange, getAllTextNodes } from './text-fragment-utils';
 
 // used for click debouncing
 let lastOpenedTweet = 0;
@@ -17,8 +18,12 @@ export default class AnnotationThread extends ArticleElement {
             return;
         }
         event.stopPropagation();
-        let selectedText = getSafeRanges(selection.getRangeAt(0));
+        let selectedText = extractTextContent(selection);
         const intentUrl = createTweetIntentUrl(selectedText, selection, window.location.href);
+        let range = selection.getRangeAt(0);
+        let marks = markRange(range, document);
+        marks.forEach(m => {addMarkEvents(m)});
+        this.querySelector('.anno-tray').appendChild(createThread(selectedText));
 
         function makeTweet() {
             // debounce
@@ -29,13 +34,18 @@ export default class AnnotationThread extends ArticleElement {
             }
         }
 
-        this.querySelector('.anno-tray').appendChild(createThread());
-        for (let i = 0; i < selectedText.length; i++) {
-            let span = document.createElement("span");
-            span.classList.add("annotation-highlight");
-            selectedText[i].surroundContents(span);
-
-            span.addEventListener('click', makeTweet);
+        function addMarkEvents(mark) {
+            mark.addEventListener('mouseover', () => {
+                marks.forEach(m => {
+                    m.classList.add('hovered');
+                });
+            });
+            mark.addEventListener('mouseout', () => {
+                marks.forEach(m => {
+                    m.classList.remove('hovered');
+                });
+            });
+            mark.addEventListener('mousedown', makeTweet);
         }
 
         // clear selection
@@ -65,6 +75,16 @@ export default class AnnotationThread extends ArticleElement {
     }
 }
 
+function extractTextContent(selection) {
+    let range = selection.getRangeAt(0);
+    let textNodes = getAllTextNodes(range.commonAncestorContainer, range).flat(1);
+    if (textNodes && textNodes.length === 0) return `${range}`;
+    let text = textNodes.map(m=>m.textContent).join('');
+    let endOffset = text.length-textNodes[textNodes.length - 1].length + range.endOffset;
+    let startOffset = range.startOffset;
+    return text.slice(text.lastIndexOf(' ', startOffset) , endOffset + text.slice(endOffset).indexOf(' '));
+}
+
 function createTweetIntentUrl(text, selection, url) {
     const result = generateFragment(selection);
 
@@ -89,81 +109,15 @@ function createTweetIntentUrl(text, selection, url) {
     return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
 }
 
-function createThread() {
+function createThread(text) {
     let threadCont = document.createElement("div");
     let annoThread = document.createElement("div");
 
     threadCont.classList.add('thread-cont');
     annoThread.classList.add('anno-thread');
 
-    annoThread.textContent = window.getSelection().toString();
+    annoThread.textContent = text;
     threadCont.appendChild(annoThread);
 
     return threadCont;
-}
-
-//
-//
-// from https://stackoverflow.com/questions/304837/javascript-user-selection-highlighting, user:1725576
-//
-//
-function getSafeRanges(dangerous) {
-    var a = dangerous.commonAncestorContainer;
-    // Starts -- Work inward from the start, selecting the largest safe range
-    var s = new Array(0), rs = new Array(0);
-    if (dangerous.startContainer != a)
-        for(var i = dangerous.startContainer; i != a; i = i.parentNode)
-            s.push(i)
-    ;
-    if (0 < s.length) for(var i = 0; i < s.length; i++) {
-        var xs = document.createRange();
-        if (i) {
-            xs.setStartAfter(s[i-1]);
-            xs.setEndAfter(s[i].lastChild);
-        }
-        else {
-            xs.setStart(s[i], dangerous.startOffset);
-            xs.setEndAfter(
-                (s[i].nodeType == Node.TEXT_NODE)
-                ? s[i] : s[i].lastChild
-            );
-        }
-        rs.push(xs);
-    }
-
-    // Ends -- basically the same code reversed
-    var e = new Array(0), re = new Array(0);
-    if (dangerous.endContainer != a)
-        for(var i = dangerous.endContainer; i != a; i = i.parentNode)
-            e.push(i)
-    ;
-    if (0 < e.length) for(var i = 0; i < e.length; i++) {
-        var xe = document.createRange();
-        if (i) {
-            xe.setStartBefore(e[i].firstChild);
-            xe.setEndBefore(e[i-1]);
-        }
-        else {
-            xe.setStartBefore(
-                (e[i].nodeType == Node.TEXT_NODE)
-                ? e[i] : e[i].firstChild
-            );
-            xe.setEnd(e[i], dangerous.endOffset);
-        }
-        re.unshift(xe);
-    }
-
-    // Middle -- the uncaptured middle
-    if ((0 < s.length) && (0 < e.length)) {
-        var xm = document.createRange();
-        xm.setStartAfter(s[s.length - 1]);
-        xm.setEndBefore(e[e.length - 1]);
-    }
-    else {
-        return [dangerous];
-    }
-
-    // Concat
-    rs.push(xm);
-    return rs.concat(re);
 }
