@@ -18,10 +18,14 @@ export default class AnnotationThread extends ArticleElement {
             return;
         }
         event.stopPropagation();
-        let selectedText = extractTextContent(selection);
-        const intentUrl = createTweetIntentUrl(selectedText, selection, window.location.href);
         let range = selection.getRangeAt(0);
+
+        let selectedText = extractTextContent(range);
+        const intentUrl = createTweetIntentUrl(selectedText, selection, window.location.href);
         let marks = markRange(range, document);
+
+        if (marks.length === 0) return;
+
         marks.forEach(m => {addMarkEvents(m)});
         this.querySelector('.anno-tray').appendChild(createThread(selectedText));
 
@@ -75,14 +79,24 @@ export default class AnnotationThread extends ArticleElement {
     }
 }
 
-function extractTextContent(selection) {
-    let range = selection.getRangeAt(0);
+function extractTextContent(range) {
     let textNodes = getAllTextNodes(range.commonAncestorContainer, range).flat(1);
-    if (textNodes && textNodes.length === 0) return `${range}`;
-    let text = textNodes.map(m=>m.textContent).join('');
-    let endOffset = text.length-textNodes[textNodes.length - 1].length + range.endOffset;
-    let startOffset = range.startOffset;
-    return text.slice(text.lastIndexOf(' ', startOffset) , endOffset + text.slice(endOffset).indexOf(' '));
+    let text = textNodes.length !== 0 ? textNodes.map(m=>m.textContent).join('') : range.startContainer.textContent;
+
+    let firstSpaceFound = text.lastIndexOf(' ', range.startOffset);
+    let firstSpaceOffset = firstSpaceFound !== -1 ? firstSpaceFound: 0;
+
+    let lastSpaceFound, lastSpaceOffset;
+    if (textNodes.length === 0) {
+        lastSpaceFound = text.slice(range.endOffset).indexOf(' ');
+        lastSpaceOffset = range.endOffset + (lastSpaceFound !== -1 ? lastSpaceFound: 0);
+    } else {
+        let lenEndNode = textNodes[textNodes.length - 1].length;
+        let endOffset = text.length - lenEndNode + range.endOffset;
+        lastSpaceFound = text.slice(endOffset).indexOf(' ');
+        lastSpaceOffset = endOffset + (lastSpaceFound !== -1 ? lastSpaceFound : lenEndNode);
+    }
+    return text.slice(firstSpaceOffset, lastSpaceOffset);
 }
 
 function createTweetIntentUrl(text, selection, url) {
