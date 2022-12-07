@@ -22,6 +22,7 @@
 
     max-height: 200px;
 	overflow-y: auto;
+    cursor: pointer;
 }
 
 .anno-thread > p {
@@ -57,8 +58,11 @@
     transition: background 0.1s ease-out;
 }
 
-.hovered {
+.hovered, .anno-thread:hover, .annotation-highlight:hover {
     background: #ffdf2b;
+}
+
+.annotation-highlight:hover {
     padding: 2px;
     margin: 0 -2px;
 }
