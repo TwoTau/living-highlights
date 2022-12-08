@@ -145,6 +145,7 @@ annotation-thread {
     align-items: center;
     box-sizing: border-box;
     width: 30px;
+    cursor: pointer;
     background-color: var(--ui-element-color);
     transition: transform 600ms cubic-bezier(.05, .4, .25, .95);
 }
@@ -160,7 +161,6 @@ annotation-thread {
 .anno-button {
     top: 200px;
     height: 100px;
-	cursor: pointer;
     color: black;
 	font-size: 1.4em;
     border-bottom-left-radius: 30px;
@@ -200,7 +200,7 @@ annotation-thread {
     z-index: 2;
 }
 
-.tooltip-tweet, .tooltip-highlight {
+.tooltip-tweet, .tooltip-highlight, .tooltip-remove {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -214,7 +214,7 @@ annotation-thread {
     border-right: 1px solid rgba(38, 41, 50, 1.0);
 }
 
-.icon-tweet, .icon-highlight {
+.icon-tweet, .icon-highlight, .icon-remove {
     width: 25px;
     height: 25px;
 }

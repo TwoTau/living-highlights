@@ -2,7 +2,7 @@ import { html, render } from 'lit';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { ArticleElement } from '@living-papers/components';
 import { generateFragment } from './fragment-generation-utils';
-import { markRange, getAllTextNodes, parseFragmentDirectives, getFragmentDirectives, processTextFragmentDirective } from './text-fragment-utils';
+import { markRange, getAllTextNodes, removeMarks, parseFragmentDirectives, getFragmentDirectives, processTextFragmentDirective } from './text-fragment-utils';
 import { ColorPickerControl } from './color-picker';
 import { getTweets } from './api';
 
@@ -22,7 +22,7 @@ export default class AnnotationThread extends ArticleElement {
                 const selectedText = range ? extractTextContent(range) : 'Unknown';
 
                 if (range) {
-                    this.highlightRange(range, tweet.fragment);
+                    this.highlightRange(range, null, tweet.fragment);
                 }
 
                 createTweetThread({
@@ -44,12 +44,21 @@ export default class AnnotationThread extends ArticleElement {
     mouseUp() {
         const selection = window.getSelection();
         if (!selection.toString()) return;
-        const rect = selection.getRangeAt(0).getBoundingClientRect();
-        this.createTooltip(document.body.querySelector('article'),
-            rect.x + rect.width / 2.0 + window.scrollX - 30, rect.y - 40 + window.scrollY, selection);
+        const tooltip = this.createOnlyTooltip(selection.getRangeAt(0));
+
+        document.addEventListener('selectionchange', () => { tooltip.style.display = 'none'; });
+        tooltip.querySelector('.tooltip-tweet').addEventListener('mousedown', () => {this.highlight(selection, tooltip, true)});
+        tooltip.querySelector('.tooltip-highlight').addEventListener('mousedown', () => {this.highlight(selection, tooltip)});
+        tooltip.querySelector('.tooltip-highlight').removeEventListener('mousedown', () => {this.highlight(selection, tooltip)});
+        tooltip.querySelector('.tooltip-tweet').removeEventListener('mousedown', () => {this.highlight(selection, tooltip, true)});
     }
 
-    createTooltip(parent, x, y, selection) {
+    createOnlyTooltip(range) {
+        const rect = range.getBoundingClientRect();
+        const parent = document.body.querySelector('article');
+        const x = rect.x + rect.width / 2.0 + window.scrollX - 30;
+        const y = rect.y - 40 + window.scrollY;
+
         const tooltip = document.createElement('div');
         tooltip.classList.add('anno-tooltip');
         tooltip.style.top = `${y}px`;
@@ -58,14 +67,13 @@ export default class AnnotationThread extends ArticleElement {
                 <div class="tooltip-highlight"><div class='icon-highlight'></div></div>`;
         parent.insertBefore(tooltip, parent.firstChild)
         render(tooltipContents, tooltip);
-        document.addEventListener('selectionchange', () => { tooltip.style.display = 'none'; });
-        tooltip.querySelector('.tooltip-tweet').addEventListener('mousedown', () => { this.highlight(selection, true) });
-        tooltip.querySelector('.tooltip-highlight').addEventListener('mousedown', () => { this.highlight(selection) });
+
+        return tooltip;
     }
 
-    highlight(selection, tweet = false) {
+    highlight(selection, tooltip, tweet = false) {
         let range = selection.getRangeAt(0);
-        const selectedText = this.highlightRange(range, selection, tweet);
+        const selectedText = this.highlightRange(range, tooltip, selection, tweet);
 
         // clear selection
         selection.removeAllRanges();
@@ -79,15 +87,29 @@ export default class AnnotationThread extends ArticleElement {
         });
     }
 
-    highlightRange(range, selectionOrFragment, tweet = false) {
+    highlightRange(range, tooltip, selectionOrFragment, tweet = false) {
         console.log(range, selectionOrFragment);
         let selectedText = extractTextContent(range);
         const intentUrl = createTweetIntentUrl(selectedText, selectionOrFragment, window.location.href);
         let marks = markRange(range, document);
 
-        console.log('marks', marks);
-
         marks.forEach(m => { addMarkEvents(m) });
+
+        if (tooltip) {
+            let hl = tooltip.querySelector('.tooltip-highlight');
+            tooltip.querySelector('.tooltip-tweet').addEventListener('mousedown', () => {makeTweet()});
+            if (hl) {
+                hl.className = 'tooltip-remove';
+                hl.textContent = 'X';
+                hl.addEventListener('mousedown', () => {
+                    const thread = null;
+                    thread.remove?.();
+                    tooltip.remove();
+                    removeMarks(marks);
+                });
+            }
+
+        }
 
         function makeTweet() {
             // debounce
@@ -100,14 +122,20 @@ export default class AnnotationThread extends ArticleElement {
 
         function addMarkEvents(mark) {
             mark.addEventListener('mouseover', () => {
+                tooltip.style.display = 'flex';
                 marks.forEach(m => {
                     m.classList.add('hovered');
                 });
             });
-            mark.addEventListener('mouseout', () => {
+            mark.addEventListener('mouseout', async (e) => {
                 marks.forEach(m => {
                     m.classList.remove('hovered');
                 });
+                if (marks.includes(e.target)) return;
+                await new Promise(resolve => setTimeout(resolve, 500));
+                if (tooltip) {
+                    tooltip.style.display = 'none';
+                }
             });
             mark.addEventListener('mousedown', makeTweet);
         }
@@ -216,8 +244,9 @@ function createTweetThread({
 }) {
     const thread = document.createElement('div');
     thread.classList.add('thread');
+    thread.classList.add('type-tweet');
     let threadContents = html`
-        <div class="thread-info type-tweet">
+        <div class="thread-info">
             <div class="thread-username"><a href="${link}" target="_blank">${username}</a></div>
             <div class="thread-type">Tweet</div>
         </div>
@@ -228,6 +257,7 @@ function createTweetThread({
         <div class="thread-datetime">${threadDate.toLocaleString()}</div>`;
     parent.insertBefore(thread, parent.firstChild)
     render(threadContents, thread);
+    return thread;
 }
 
 function createHighlightThread({
@@ -239,8 +269,9 @@ function createHighlightThread({
 }) {
     const thread = document.createElement('div');
     thread.classList.add('thread');
+    thread.classList.add('type-highlight');
     let threadContents = html`
-        <div class="thread-info type-highlight">
+        <div class="thread-info">
             <div class="thread-username">${username}</div>
             <div class="thread-type">Highlight</div>
         </div>
@@ -251,6 +282,7 @@ function createHighlightThread({
         <div class="thread-datetime">${threadDate.toLocaleString()}</div>`;
     parent.insertBefore(thread, parent.firstChild)
     render(threadContents, thread);
+    return thread;
 }
 
 // Taken from StackOverflow: https://stackoverflow.com/a/3890175/5038563

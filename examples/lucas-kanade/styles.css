@@ -13,6 +13,10 @@
 	}
 } */
 
+.thread.type-highlight {
+    display: none;
+}
+
 .sticky:has(#fig2) {
 	top: 32px;
 }
