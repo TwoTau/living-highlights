@@ -1,4 +1,4 @@
-const BASE_URL = 'http://attu3.cs.washington.edu:2976/search/';
+const BASE_URL = 'https://living-highlights-server.herokuapp.com/search/';
 const SEARCH = 'vishald.com%2Fliving-highlights';
 
 async function getTweetsOnline() {

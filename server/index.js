@@ -2,7 +2,7 @@ import { TwitterApi } from 'twitter-api-v2';
 import express from 'express';
 import cors from 'cors';
 
-const PORT = +(process.env.port ?? 2976);
+const PORT = +(process.env.PORT || 2976);
 
 const TOKEN = 'AAAAAAAAAAAAAAAAAAAAAE6OiwEAAAAAeYbl4zqLU6q91RVW8ZI%2FPNekttw%3DZ2w6UUuJ8VfAiUdsWDVRzVl9ngiAd6h1f2ePC9DYwMFP7n1WxA';
 
