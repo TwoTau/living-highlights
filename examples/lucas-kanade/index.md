@@ -1,28 +1,25 @@
 ---
-title: An Iterative Image Registration Technique with an Application to Stereo Vision
+title: Living Highlights
 author:
-  - name: Bruce D. Lucas
+  - name: Vishal Devireddy
     email: none
-    org: Carnegie-Mellon University
-    city: Pittsburgh
-    state: Pennsylvania
+    org: University of Washington
+    city: Seattle
+    state: Washington
     country: United States
-  - name: Takeo Kanade
+  - name: Tu Nguyen
     email: none
-    org: Carnegie-Mellon University
-    city: Pittsburgh
-    state: Pennsylvania
+    org: University of Washington
+    city: Seattle
+    state: Washington
     country: United States
 conference: Proceedings of the 7th International Joint Conference on Artificial Intelligence (IJCAI '81)
 keywords: 
-  - Computing methodologies
-  - Computer graphics
-  - Image manipulation
-  - Optical Flow
+  - Living papers
+  - Social media
 theme: distill
 section-numbers: false
-year: 1981
-doi: 10.5555/1623264.1623280
+year: 2022
 output:
   html: 
     styles: styles.css
@@ -30,14 +27,6 @@ output:
 ---
 
 [:annotation-thread:]{}
-
-::: aside
-Converted to Living Papers format by Tu Nguyen and Vishal Devireddy for CSE 599D.
-
-[Source code](https://github.com/TwoTau/lucas-kanade)
-
-[Original paper](https://courses.cs.duke.edu/spring19/compsci527/papers/Lucas.pdf)
-:::
 
 ~~~ definitions
 @h :h: disparity vector
@@ -356,151 +345,6 @@ as the quantity to minimize with respect to $@\alpha$, $@\beta$, $@A$, and $@h$.
 # Application to stereo vision {#sec5}
 
 In this section we show how the generalized registration algorithm described above can be applied to extracting depth information from stereo images.
-
-## The stereo problem {#sec5_1}
-
-The problem of extracting depth information from a stereo pair has in principle four components: finding objects in the pictures, matching the objects in the two views, determining the camera parameters, and determining the distances from the camera to the objects. Our approach is to combine object matching with solving for the camera parameters and the distances of the objects by using a form of the fast registration technique described above.
-
-Techniques for locating objects include an interest operator [@Moravec1979], zero crossings in bandpass-filtered images [@Marr1979], and linear features [@Baker1980]. One might also use regions found by an image segmentation program as objects.
-
-Stereo vision systems which work with features at the pixel level can use one of the registration techniques discussed above. Systems whose objects are higher-level features must use some difference measure and some search technique suited to the particular feature being used. Our registration algorithm provides a stereo vision system with a fast method of doing pixel-level matching.
-
-Many stereo vision systems concern themselves only with calculating the distances to the matched objects. One must also be aware that in any real application of stereo vision the relative positions of the cameras will not be known with perfect accuracy. @Gennery1979 has shown how to simultaneously solve for the camera parameters and the distances of objects.
-
-## A mathematical characterization {#sec5_2}
-
-The notation we use is illustrated in @fig:fig3. Let $c$ be the vector of camera parameters that describe the orientation and position of camera 2 with respect to camera 1's coordinate system. These parameters are azimuth, elevation, pan, tilt, and roll, as defined in @Gennery1979. Let $x$ denote the position of an image in the camera 1 film plane of an object. Suppose the object is at a distance $z$ from camera 1. Given the position in picture 1 $x$ and distance $z$ of the object, we could directly calculate the position $p(x, z)$ that it must have occupied in three-space. We express $p$ with respect to camera 1's coordinate system so that $p$ does not depend on the orientation of camera 1. The object would appear on camera 2's film plane at a position $q(p, c)$ that is dependent on the object's position in three-space $p$ and on the camera parameters $c$. Let $G(x)$ be the intensity value of pixel $x$ in picture 1, and let $F(q)$ the intensity value of pixel $q$ in picture 2. The goal of a stereo vision system is to invert the relationship described above and solve for $c$ and $z$, given $x$, $F$ and $G$.
-
-::: figure {#fig3 .center}
-```js
-html`<img src="assets/fig3.svg" style="width:50%;">`;
-```
-| Stereo vision.
-:::
-
-## Applying the registration algorithm {#sec5_3}
-
-First consider the case where we know the exact camera parameters $c$, and we wish to discover the distance $z$ of an object. Suppose we have an estimate of the distance $z$. We wish to see what happens to the quality of our match between $F$ and $G$ as we vary $z$ by an amount $\Delta z$. The linear approximation that we use here is:
-
-$F(z + \Delta z) \approx F(z) + \Delta \frac{\partial F}{\partial z}$,
-
-where
-
-~~~ equation {#e12}
-\frac{\partial F}{\partial z} = \frac{\partial p}{\partial z} \frac{\partial q}{\partial p} \frac{\partial F}{\partial q}
-~~~
-
-This equation is due to the chain rule of the gradient operator; $\partial q / \partial p$ is a matrix of partial derivatives of the components of $q$ with respect to the components of $p$, and $\partial F / \partial q$ is the spatial intensity gradient of the image $F(q)$. To update our estimate of $z$, we want to find the $\Delta z$ which satisfies
-
-~~~ math
-0 = \frac{\partial}{\partial \Delta z} E \approx \frac{\partial}{\partial \Delta z} \sum_x [F + \Delta z \frac{\partial F}{\partial \Delta z} - G]^2
-~~~
-
-Solving for $\delta z$, we obtain
-
-~~~ math
-\delta z = \sum_x \frac{\partial F}{\partial \Delta z} [G - F] / \sum_x \left( \frac{\partial F}{\partial z} \right)^2
-~~~
-
-where $\frac{\partial F}{\partial z}$ is given by @eqn:e12.
-
-On the other hand. suppose we know the distances $z_i, i = 1, 2, \dots, n$, of each of $n$ objects from camera 1, but we don't know the exact camera parameters $c$. We wish to determine the effect of changing our estimate of the camera parameters by an amount $\Delta c$. Using the linear approximation
-
-~~~ math
-F(c + \Delta c) \approx F(c) + \Delta c \frac{\partial q}{\partial c} \frac{\partial F}{\partial q}
-~~~
-
-we solve the minimization of the error function with respect to $\Delta c$ by setting
-
-~~~ math
-0 = \frac{\partial}{\partial \Delta c} \sum_i \sum_{x \varepsilon R_i} [F(c + \Delta c) - G]^2 \approx \frac{\partial}{\partial \Delta c} \sum_i \sum_{x} [F + \Delta c \frac{\partial q}{\partial c} \frac{\partial F}{\partial q} - G]^2
-~~~
-
-obtaining
-
-~~~ math
-\Delta c \approx \left[\sum_x \left(\frac{\partial q}{\partial c} \frac{\partial F}{\partial q} \right)^\top [G-F] \right] \left[ \left(\frac{\partial q}{\partial c} \frac{\partial F}{\partial q} \right)^\top \left(\frac{\partial q}{\partial c} \frac{\partial F}{\partial q} \right) \right]^{-1}
-~~~
-
-As with the other techniques derived in this paper, weighting and iteration improve the solutions for $\Delta z$ and $\Delta c$ derived above.
-
-## An implementation {#sec5_4}
-
-We have implemented the technique described above in a system which functions well under human supervision. Our program is capable of solving for the distances to the objects, the five camera parameters described above, and a brightness and contrast parameter for the entire scene, or any subset of these parameters. As one would expect from the discussion in section @sec:sec4_3, the algorithm will converge to the correct distances and camera parameters when the initial estimates of the $z_i$'s and $c$ are sufficiently accurate that we know the position in the camera 2 film plane of each object to within a distance on the order of the size of the object. 
-
-A session with this program is illustrated in figures 4 through 10. The original stereo pair is presented in @fig:fig4. (Readers who can view stereo pairs cross-eyed will want to hold the pictures upside down so that each eye receives the correct view). The camera parameters were determined independently by hand-selecting matching points and solving for the parameters using the program described in [@Gennery1979].
-
-@fig:fig5 and @fig:fig6 are bandpass-flitered versions of the pictures in @fig:fig4. Bandpass-filtered images are preferred to lowpass-filtered images in finding matches because very low spatial frequencies tend to be a result of shading differences and carry no (or misleading) depth information. The two regions enclosed in rectangles in the left view of @fig:fig5 have been hand-selected and assigned an initial depth of $7.0$ in units of the distance between cameras. If these were the actual depths, the corresponding objects would be found in the right view at the positions indicated @fig:fig5. After seven depth-adjustment iterations, the program found the matches shown in @fig:fig6. The distances are $6.05$ for object 1 and $5.86$ for object 2.
-
-@fig:fig7 and @fig:fig8 are bandpass-filtered with a band one octave higher than @fig:fig5 and @fig:fig6. Five new points have been hand-selected in the left view, reflecting the different features which have become visible in this spatial frequency range. Each has been assigned an initial depth equal to that found for the corresponding larger region in @fig:fig6. The predicted position corresponding to these depths is shown in the right view of @fig:fig7. After five depth-adjustment iterations, the matches shown in @fig:fig8 were found. The corresponding depths are $5.96$ for object 1, $5.98$ for object 2, $5.77$ for object 3, $5.78$ for object 4, and $6.09$ for object 5.
-
-@fig:fig9 and @fig:fig10 are bandpass-filtered with a band yet another octave higher than @fig:fig7 and @fig:fig8. Again five new points have been hand-selected in the left view, reflecting the different features which have become visible in this spatial frequency range. Each has been assigned an initial depth equal to that found for the corresponding region in @fig:fig8. The predicted position corresponding to these depths is shown in the right view of @fig:fig9. After four depthadjustment iterations, the matches shown in @fig:fig10 were found. The corresponding depths are $5.97$ for object 1, $5.98$ for object 2, $5.80$ For object 3, $5.77$ for object 4, and $5.98$ for object 5.
-
-## Future research {#sec5_5}
-
-The system that we have implemented at present requires considerable hand-guidance. The following are the issues we intend to investigate toward the goal of automating the process.
-
-- Providing initial depth estimates for objects: one should be able to use approximate depths obtained from low resolution images to provide initial depth estimates for nearby objects visible only at higher resolutions. This suggests a coarse-fine paradigm not just for the problem of finding individual matches but for the problem of extracting depth infortnation as a whole.
-
-- Constructing a depth map: one could construct a depth map from depth measurements by some interpolation method, and refine the depth map with depth measurements obtained from successively higher resolution views.
-
-- Selecting points of interest: the various techniques mentioned in section @sec:sec3 should be explored.
-
-- Tracking sudden depth changes: the sudden depth changes found at the edges of objects require some set of higher-level heuristics to keep the matching algorithm on track at object boundaries.
-
-- Compensating for the different appearances of objects in the two views: the general form of the matching algorithm that allows for arbitrary linear transformations should be useful here.
-
-# Acknowledgements {#sec6}
-We would like to thank Michael Horowitz, Richard Korf, and Pradeep Sindhu for their helpful comments on early drafts of this paper.
-
-::: figure {#fig4}
-```js
-html`<img src="assets/fig4.png" style="width:100%;">`;
-```
-|
-:::
-
-::: figure {#fig5}
-```js
-html`<img src="assets/fig5.png" style="width:100%;">`;
-```
-|
-:::
-
-::: figure {#fig6}
-```js
-html`<img src="assets/fig6.png" style="width:100%;">`;
-```
-|
-:::
-
-::: figure {#fig7}
-```js
-html`<img src="assets/fig7.png" style="width:100%;">`;
-```
-|
-:::
-
-::: figure {#fig8}
-```js
-html`<img src="assets/fig8.png" style="width:100%;">`;
-```
-|
-:::
-
-::: figure {#fig9}
-```js
-html`<img src="assets/fig9.png" style="width:100%;">`;
-```
-|
-:::
-
-::: figure {#fig10}
-```js
-html`<img src="assets/fig10.png" style="width:100%;">`;
-```
-|
-:::
 
 ~~~ bibliography
 @article{Barnea1972,
