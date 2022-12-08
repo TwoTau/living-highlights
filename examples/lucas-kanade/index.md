@@ -40,7 +40,7 @@ The Living Highlights tool simplifies the process of paper discussion while maki
 ::: figure {.margin}
 ![](assets/why-twitter.png){border=2}
 
-| Why academics use Twitter. [Source (Nature)](https://www.nature.com/news/online-collaboration-scientists-and-the-social-network-1.15711), [Source (Tweet)](https://twitter.com/academicssay/status/501887085918560256)
+| Why academics use Twitter. Source: [@doi:10.1038/512126a], [Source (Tweet)](https://twitter.com/academicssay/status/501887085918560256)
 :::
 
 ## Goals
@@ -61,22 +61,22 @@ The benefits to the overall scholarly research community lie in better collabora
 ::: aside
 "Who in their right mind is going to log on to the *PLoS One* site solely to comment on a paper? [...] I guarantee that there are more comments on Twitter about a *PLoS* paper."
 
-— [Jonathan Eisen](https://twitter.com/phylogenomics), academic editor-in-chief of *PLoS Biology*, in [Nature](https://www.nature.com/articles/469286a)
+— [Jonathan Eisen](https://twitter.com/phylogenomics), academic editor-in-chief of *PLoS Biology*, in [@doi:10.1038/469286a]
 :::
 
 ## Related work
 
 The blogging platform Medium successfully uses social annotations called "highlights" to increase engagement. Readers highlight sections of text that are visible to their followers. These highlights can be further commented on, just like an article.
 
-There were several attempts to make platforms for open peer review or open discussion of research papers, most of which are now discontinued due to adoption. The limitations of these systems are:
+There were several past attempts to make platforms for open peer review or open discussion of research papers. Almost of these are now discontinued due to adoption or other issues, such as the Selected Papers Network [@doi:10.3389/fncom.2012.00001], Journal Fire, Phygg, Annotatr, and Google Reader. The limitations of these systems are:
 
 - **Centralization**: The centralized platform requires the creators to continue hosting comments.
 - **Non-anonymous**: Commenting is public, discouraging junior researchers.
 - **Low adoption**: Commenting requires adopting an unfamiliar system. Early adopters get litle benefit.
 
-Read wear is a project related to highlights that shows the sections of text that readers spend the most time on. Similarly, highlights show the sections of text that readers find the most important. 
+Read wear [@doi:10.1145/142750.142751] is a project related to highlights that shows the sections of text that readers spend the most time on. Similarly, highlights show the sections of text that readers find the most important. 
 
-NB, a social annotation forum used in classrooms, allows public highlights and discussion threads on PDFs. NB is used to ask/answer questions and tag sections of text with labels. 
+NB [@doi:10.1145/2207676.2208326], a social annotation forum used in classrooms, allows public highlights and discussion threads on PDFs. NB is used to ask/answer questions and tag sections of text with labels. 
 
 Related to the Twitter aspect of this project, LitTweeture enables researchers to semi-anonymously ask questions about a paper.
 
@@ -190,7 +190,3 @@ It is not always possible to generate a text fragment that uniquely identifies a
 ## Recent events at Twitter
 
 [Recent events](https://en.wikipedia.org/wiki/Acquisition_of_Twitter_by_Elon_Musk) have  changed Twitter, but it's not yet clear how that will affect academic Twitter users. Still, the main insights of this project apply to all commonly used social media platforms.
-
-~~~ bibliography
-
-~~~

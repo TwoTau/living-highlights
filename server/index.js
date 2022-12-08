@@ -17,6 +17,11 @@ async function getAuthorInfo(authorId) {
 }
 
 async function getTweets(query) {
+	if (query.length < 10) {
+		console.error(`Query '${query}' too short`);
+		return [];
+	}
+
 	const tweets = [];
 
 	const searchResults = await client.v2.search(query + ' -is:retweet', {
@@ -60,9 +65,13 @@ app.get('/search/:query?', async (req, res) => {
 	if (!query) {
 		return res.status(400).send('No search query provided');
 	};
-	res.json({
-		tweets: await getTweets(query),
-	});
+	try {
+		res.json({
+			tweets: await getTweets(query),
+		});
+	} catch (e) {
+		res.status(500).send(e);
+	}
 });
 
 app.listen(PORT, () => {
