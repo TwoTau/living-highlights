@@ -1,7 +1,7 @@
 import { html, render } from 'lit';
 import { ArticleElement } from '@living-papers/components';
 import { generateFragment } from './fragment-generation-utils';
-import { markRange, getAllTextNodes } from './text-fragment-utils';
+import { markRange, getAllTextNodes, removeMarks } from './text-fragment-utils';
 import { ColorPickerControl } from './color-picker';
 
 // used for click debouncing
@@ -32,11 +32,13 @@ export default class AnnotationThread extends ArticleElement {
         render(tooltipContents, tooltip);
         document.addEventListener('selectionchange', () => {tooltip.style.display = 'none';});
         const thread = document.querySelector('annotation-thread');
-        tooltip.querySelector('.tooltip-tweet').addEventListener('mousedown', () => {thread.highlight(selection, true)});
-        tooltip.querySelector('.tooltip-highlight').addEventListener('mousedown', () => {thread.highlight(selection)});
+        tooltip.querySelector('.tooltip-tweet').addEventListener('mousedown', () => {thread.highlight(selection, tooltip, true)});
+        tooltip.querySelector('.tooltip-highlight').addEventListener('mousedown', () => {thread.highlight(selection, tooltip)});
+        tooltip.querySelector('.tooltip-highlight').removeEventListener('mousedown', () => {thread.highlight(selection, tooltip)});
+        tooltip.querySelector('.tooltip-tweet').removeEventListener('mousedown', () => {thread.highlight(selection, tooltip, true)});
     }
 
-    highlight(selection, tweet=false) {
+    highlight(selection, tooltip, tweet=false) {
         let range = selection.getRangeAt(0);
 
         let selectedText = extractTextContent(range);
@@ -45,11 +47,24 @@ export default class AnnotationThread extends ArticleElement {
 
         if (marks.length === 0) return;
 
-        marks.forEach(m => {addMarkEvents(m)});
-        createThread(this.querySelector('.anno-threads'), 'Username', selectedText,
+        let thread = createThread(this.querySelector('.anno-threads'), 'Username', selectedText,
             new Date().toString(), 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
             (tweet ? 'Tweet' : 'Highlight')
         );
+
+        let hl = tooltip.querySelector('.tooltip-highlight');
+        tooltip.querySelector('.tooltip-tweet').addEventListener('mousedown', () => {makeTweet()});
+        if (hl) {
+            hl.className = 'tooltip-remove';
+            hl.textContent = 'X';
+            hl.addEventListener('mousedown', () => {
+                thread.remove();
+                tooltip.remove();
+                removeMarks(marks);
+            });
+        }
+
+        marks.forEach(m => {addMarkEvents(m)});
 
         function makeTweet() {
             // debounce
@@ -62,21 +77,24 @@ export default class AnnotationThread extends ArticleElement {
 
         function addMarkEvents(mark) {
             mark.addEventListener('mouseover', () => {
+                tooltip.style.display = 'flex';
                 marks.forEach(m => {
                     m.classList.add('hovered');
                 });
             });
-            mark.addEventListener('mouseout', () => {
+            mark.addEventListener('mouseout', async (e) => {
                 marks.forEach(m => {
                     m.classList.remove('hovered');
                 });
+                if (marks.includes(e.target)) return;
+                await new Promise(resolve => setTimeout(resolve, 500));
+                tooltip.style.display = 'none';
             });
             mark.addEventListener('mousedown', makeTweet);
         }
 
         // clear selection
         selection.removeAllRanges();
-
         if (tweet) makeTweet();
     }
 
@@ -177,6 +195,7 @@ function createThread (parent, username, threadText, threadDate, threadComment=n
                     <div class="thread-datetime">${threadDate}</div>`;
     parent.insertBefore(thread, parent.firstChild)
     render(threadContents, thread);
+    return thread;
 }
 
 function createTweetIntentUrl(text, selection, url) {
