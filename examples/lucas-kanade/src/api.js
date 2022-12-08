@@ -1,5 +1,5 @@
 const BASE_URL = 'http://localhost:2976/search/';
-const SEARCH = 'vishald.com';
+const SEARCH = 'vishald.com/living-highlights';
 
 async function getTweetsOnline() {
 	const response = await fetch(`${BASE_URL}${SEARCH}`);

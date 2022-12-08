@@ -17,6 +17,12 @@
     display: none;
 }
 
+#early-adoption + q {
+    border-left: 4px solid gray;
+    display: block;
+    padding-left: 12px;
+}
+
 .sticky:has(#fig2) {
 	top: 32px;
 }
