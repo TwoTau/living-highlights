@@ -65,8 +65,10 @@ We need a server to use the Twitter API.
 # Limitations
 
 ## (Early) adoption
-<blockquote cite="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3264905/">Systemic reform always faces a bootstrap problem: early adopters gain little benefit (because no one else is participating in the new system yet) and suffer high costs.</blockquote>
-<figcaption>—Christopher Lee, author of the now discontinued <cite>Selected-Papers Network</cite></figcaption>
+<blockquote cite="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3264905/">"Systemic reform always faces a bootstrap problem: early adopters gain little benefit (because no one else is participating in the new system yet) and suffer high costs."</blockquote>
+<figcaption>
+— Christopher Lee, author of the now discontinued <cite>Selected-Papers Network</cite>
+</figcaption>
 
 Early adoption is the biggest problem that all social annotation platforms face.
 

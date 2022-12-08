@@ -158,25 +158,32 @@ function createThread (parent, username, threadText, threadDate, threadComment=n
 }
 
 function createTweetIntentUrl(text, selection, url) {
-    const result = generateFragment(selection);
-
-    if (result.status === 0) {
-        const fragment = result.fragment;
-        const prefix = fragment.prefix ?
-            `${encodeURIComponent(fragment.prefix)}-,` :
-            '';
-        const suffix = fragment.suffix ?
-            `,-${encodeURIComponent(fragment.suffix)}` :
-            '';
-        const textStart = encodeURIComponent(fragment.textStart);
-        const textEnd = fragment.textEnd ?
-            `,${encodeURIComponent(fragment.textEnd)}` :
-            '';
-
-        url += '#:~:text=' + prefix + textStart + textEnd + suffix;
-    }
-
     text = `"${text}"`;
+    let intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 
-    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    try {
+        const result = generateFragment(selection);
+    
+        if (result.status === 0) {
+            const fragment = result.fragment;
+            const prefix = fragment.prefix ?
+                `${encodeURIComponent(fragment.prefix)}-,` :
+                '';
+            const suffix = fragment.suffix ?
+                `,-${encodeURIComponent(fragment.suffix)}` :
+                '';
+            const textStart = encodeURIComponent(fragment.textStart);
+            const textEnd = fragment.textEnd ?
+                `,${encodeURIComponent(fragment.textEnd)}` :
+                '';
+    
+            url += '#:~:text=' + prefix + textStart + textEnd + suffix;
+        }
+
+        intent += `&url=${encodeURIComponent(url)}`;
+    } catch (e) {
+        console.error('Error generating fragment', e);
+    }
+    
+    return intent;
 }
