@@ -1,8 +1,10 @@
 import { html, render } from 'lit';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { ArticleElement } from '@living-papers/components';
 import { generateFragment } from './fragment-generation-utils';
-import { markRange, getAllTextNodes } from './text-fragment-utils';
+import { markRange, getAllTextNodes, parseFragmentDirectives, getFragmentDirectives, processTextFragmentDirective } from './text-fragment-utils';
 import { ColorPickerControl } from './color-picker';
+import { getTweets } from './api';
 
 // used for click debouncing
 let lastOpenedTweet = 0;
@@ -10,15 +12,41 @@ let lastOpenedTweet = 0;
 export default class AnnotationThread extends ArticleElement {
     constructor() {
         super();
-        document.addEventListener('mouseup', this.mouseUp);
+        document.addEventListener('mouseup', this.mouseUp.bind(this));
+
+        getTweets().then((tweets) => {
+            console.table(tweets);
+
+            for (const tweet of tweets) {
+                const range = fragmentToRange(tweet.fragment);
+                const selectedText = range ? extractTextContent(range) : 'Unknown';
+
+                if (range) {
+                    this.highlightRange(range, tweet.fragment);
+                }
+
+                createTweetThread({
+                    parent: this.querySelector('.anno-threads'),
+                    link: tweet.link,
+                    username: tweet.name,
+                    threadText: selectedText,
+                    threadDate: new Date(tweet.time),
+                    threadComment: tweet.text,
+                });
+            }
+        });
+
+        setTimeout(() => {
+            this.openTab();
+        }, 1000);
     }
 
     mouseUp() {
         const selection = window.getSelection();
         if (!selection.toString()) return;
         const rect = selection.getRangeAt(0).getBoundingClientRect();
-        document.querySelector('annotation-thread').createTooltip(document.body.querySelector('article'),
-                 rect.x + rect.width / 2.0 + window.scrollX - 30, rect.y - 40 + window.scrollY, selection);
+        this.createTooltip(document.body.querySelector('article'),
+            rect.x + rect.width / 2.0 + window.scrollX - 30, rect.y - 40 + window.scrollY, selection);
     }
 
     createTooltip(parent, x, y, selection) {
@@ -30,26 +58,36 @@ export default class AnnotationThread extends ArticleElement {
                 <div class="tooltip-highlight"><div class='icon-highlight'></div></div>`;
         parent.insertBefore(tooltip, parent.firstChild)
         render(tooltipContents, tooltip);
-        document.addEventListener('selectionchange', () => {tooltip.style.display = 'none';});
-        const thread = document.querySelector('annotation-thread');
-        tooltip.querySelector('.tooltip-tweet').addEventListener('mousedown', () => {thread.highlight(selection, true)});
-        tooltip.querySelector('.tooltip-highlight').addEventListener('mousedown', () => {thread.highlight(selection)});
+        document.addEventListener('selectionchange', () => { tooltip.style.display = 'none'; });
+        tooltip.querySelector('.tooltip-tweet').addEventListener('mousedown', () => { this.highlight(selection, true) });
+        tooltip.querySelector('.tooltip-highlight').addEventListener('mousedown', () => { this.highlight(selection) });
     }
 
-    highlight(selection, tweet=false) {
+    highlight(selection, tweet = false) {
         let range = selection.getRangeAt(0);
+        const selectedText = this.highlightRange(range, selection, tweet);
 
+        // clear selection
+        selection.removeAllRanges();
+
+        createHighlightThread({
+            parent: this.querySelector('.anno-threads'),
+            username: 'You',
+            threadText: selectedText,
+            threadDate: new Date(),
+            threadComment: '',
+        });
+    }
+
+    highlightRange(range, selectionOrFragment, tweet = false) {
+        console.log(range, selectionOrFragment);
         let selectedText = extractTextContent(range);
-        const intentUrl = createTweetIntentUrl(selectedText, selection, window.location.href);
+        const intentUrl = createTweetIntentUrl(selectedText, selectionOrFragment, window.location.href);
         let marks = markRange(range, document);
 
-        if (marks.length === 0) return;
+        console.log('marks', marks);
 
-        marks.forEach(m => {addMarkEvents(m)});
-        createThread(this.querySelector('.anno-threads'), 'Username', selectedText,
-            new Date().toString(), 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            (tweet ? 'Tweet' : 'Highlight')
-        );
+        marks.forEach(m => { addMarkEvents(m) });
 
         function makeTweet() {
             // debounce
@@ -74,10 +112,9 @@ export default class AnnotationThread extends ArticleElement {
             mark.addEventListener('mousedown', makeTweet);
         }
 
-        // clear selection
-        selection.removeAllRanges();
-
         if (tweet) makeTweet();
+
+        return selectedText;
     }
 
     openTab() {
@@ -114,7 +151,7 @@ export default class AnnotationThread extends ArticleElement {
     }
 
     firstUpdated() {
-        this.colorPicker = new ColorPickerControl({ container: this.querySelector('.anno-color'), theme:'light'});
+        this.colorPicker = new ColorPickerControl({ container: this.querySelector('.anno-color'), theme: 'light' });
         this.colorPicker.on('change', (color) => {
             document.querySelector('article').style.setProperty('--highlight-color',
                 `hsla(${color.h},${color.s}%,${color.v}%, ${color.a})`);
@@ -142,17 +179,24 @@ export default class AnnotationThread extends ArticleElement {
     }
 }
 
+// fragmentHash = "#:~:text=reader%20highlights%20and%20social%20annotations"
+function fragmentToRange(fragmentHash) {
+    const dir = getFragmentDirectives(fragmentHash);
+    const frags = parseFragmentDirectives(dir);
+    return processTextFragmentDirective(frags.text[0])[0];
+}
+
 function extractTextContent(range) {
     let textNodes = getAllTextNodes(range.commonAncestorContainer, range).flat(1);
-    let text = textNodes.length !== 0 ? textNodes.map(m=>m.textContent).join('') : range.startContainer.textContent;
+    let text = textNodes.length !== 0 ? textNodes.map(m => m.textContent).join('') : range.startContainer.textContent;
 
     let firstSpaceFound = text.lastIndexOf(' ', range.startOffset);
-    let firstSpaceOffset = firstSpaceFound !== -1 ? firstSpaceFound: 0;
+    let firstSpaceOffset = firstSpaceFound !== -1 ? firstSpaceFound : 0;
 
     let lastSpaceFound, lastSpaceOffset;
     if (textNodes.length === 0) {
         lastSpaceFound = text.slice(range.endOffset).indexOf(' ');
-        lastSpaceOffset = range.endOffset + (lastSpaceFound !== -1 ? lastSpaceFound: 0);
+        lastSpaceOffset = range.endOffset + (lastSpaceFound !== -1 ? lastSpaceFound : 0);
     } else {
         let lenEndNode = textNodes[textNodes.length - 1].length;
         let endOffset = text.length - lenEndNode + range.endOffset;
@@ -162,50 +206,103 @@ function extractTextContent(range) {
     return text.slice(firstSpaceOffset, lastSpaceOffset);
 }
 
-function createThread (parent, username, threadText, threadDate, threadComment=null, threadType='Highlight') {
+function createTweetThread({
+    parent,
+    link,
+    username,
+    threadText,
+    threadDate,
+    threadComment = null,
+}) {
     const thread = document.createElement('div');
     thread.classList.add('thread');
     let threadContents = html`
-                    <div class="thread-info">
-                        <div class="thread-username">${username}</div>
-                        <div class="thread-type">${threadType}</div>
-                    </div>
-                    <div class="thread-body">
-                        <div class="thread-text">${threadText}</div>
-                        <div class="thread-comment">${threadComment}</div>
-                    </div>
-                    <div class="thread-datetime">${threadDate}</div>`;
+        <div class="thread-info type-tweet">
+            <div class="thread-username"><a href="${link}" target="_blank">${username}</a></div>
+            <div class="thread-type">Tweet</div>
+        </div>
+        <div class="thread-body">
+            <div class="thread-text">${threadText}</div>
+            <div class="thread-comment">${unsafeHTML(linkifyText(threadComment))}</div>
+        </div>
+        <div class="thread-datetime">${threadDate.toLocaleString()}</div>`;
     parent.insertBefore(thread, parent.firstChild)
     render(threadContents, thread);
 }
 
-function createTweetIntentUrl(text, selection, url) {
+function createHighlightThread({
+    parent,
+    username,
+    threadText,
+    threadDate,
+    threadComment = null,
+}) {
+    const thread = document.createElement('div');
+    thread.classList.add('thread');
+    let threadContents = html`
+        <div class="thread-info type-highlight">
+            <div class="thread-username">${username}</div>
+            <div class="thread-type">Highlight</div>
+        </div>
+        <div class="thread-body">
+            <div class="thread-text">${threadText}</div>
+            <div class="thread-comment">${threadComment}</div>
+        </div>
+        <div class="thread-datetime">${threadDate.toLocaleString()}</div>`;
+    parent.insertBefore(thread, parent.firstChild)
+    render(threadContents, thread);
+}
+
+// Taken from StackOverflow: https://stackoverflow.com/a/3890175/5038563
+function linkifyText(inputText) {
+    let replacedText, replacePattern1, replacePattern2, replacePattern3;
+
+    //URLs starting with http://, https://, or ftp://
+    replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+    replacedText = inputText.replace(replacePattern1, '<a href="$1" target="_blank">$1</a>');
+
+    //URLs starting with "www." (without // before it, or it'd re-link the ones done above).
+    replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+    replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" target="_blank">$2</a>');
+
+    //Change email addresses to mailto:: links.
+    replacePattern3 = /(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gim;
+    replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
+
+    return replacedText;
+}
+
+function createTweetIntentUrl(text, selectionOrFragment, url) {
     text = `"${text}"`;
     let intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 
     try {
-        const result = generateFragment(selection);
-    
-        if (result.status === 0) {
-            const fragment = result.fragment;
-            const prefix = fragment.prefix ?
-                `${encodeURIComponent(fragment.prefix)}-,` :
-                '';
-            const suffix = fragment.suffix ?
-                `,-${encodeURIComponent(fragment.suffix)}` :
-                '';
-            const textStart = encodeURIComponent(fragment.textStart);
-            const textEnd = fragment.textEnd ?
-                `,${encodeURIComponent(fragment.textEnd)}` :
-                '';
-    
-            url += '#:~:text=' + prefix + textStart + textEnd + suffix;
+        if (typeof selectionOrFragment === 'string') { // fragment
+            url += '#:~:text=' + selectionOrFragment;
+        } else { // selection
+            const result = generateFragment(selectionOrFragment);
+
+            if (result.status === 0) {
+                const fragment = result.fragment;
+                const prefix = fragment.prefix ?
+                    `${encodeURIComponent(fragment.prefix)}-,` :
+                    '';
+                const suffix = fragment.suffix ?
+                    `,-${encodeURIComponent(fragment.suffix)}` :
+                    '';
+                const textStart = encodeURIComponent(fragment.textStart);
+                const textEnd = fragment.textEnd ?
+                    `,${encodeURIComponent(fragment.textEnd)}` :
+                    '';
+
+                url += '#:~:text=' + prefix + textStart + textEnd + suffix;
+            }
         }
 
         intent += `&url=${encodeURIComponent(url)}`;
     } catch (e) {
         console.error('Error generating fragment', e);
     }
-    
+
     return intent;
 }

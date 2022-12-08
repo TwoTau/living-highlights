@@ -53,8 +53,8 @@ annotation-thread {
 }
 
 .thread-text {
-    padding: 10px;
-    height: 100px;
+    margin: 10px;
+    max-height: 100px;
     font-style: italic;
 }
 
@@ -63,9 +63,9 @@ annotation-thread {
     text-align: left;
 }
 
-.thread-username::before {
+/* .thread-username::before {
     content: '@';
-}
+} */
 
 .thread-datetime {
     display: flex;
@@ -77,12 +77,12 @@ annotation-thread {
 
 .thread-comment {
     min-height: 20px;
-    padding: 10px;
+    margin: 10px;
 }
 
-.thread-comment::before {
+/* .thread-comment::before {
     content: "- ";
-}
+} */
 
 .thread {
     background-color: var(--thread-color);

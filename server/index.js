@@ -1,11 +1,13 @@
 import { TwitterApi } from 'twitter-api-v2';
 import express from 'express';
+import cors from 'cors';
 
 const PORT = +(process.env.port ?? 2976);
 
 const TOKEN = 'AAAAAAAAAAAAAAAAAAAAAE6OiwEAAAAAeYbl4zqLU6q91RVW8ZI%2FPNekttw%3DZ2w6UUuJ8VfAiUdsWDVRzVl9ngiAd6h1f2ePC9DYwMFP7n1WxA';
 
 const app = express();
+app.use(cors());
 const client = new TwitterApi(TOKEN);
 const readOnlyClient = client.readOnly; // for type hints
 
@@ -18,11 +20,22 @@ async function getTweets(query) {
 	const tweets = [];
 
 	const searchResults = await client.v2.search(query + ' -is:retweet', {
-		'tweet.fields': ['created_at', 'author_id'],
+		'tweet.fields': ['created_at', 'author_id', 'entities'],
 	});
 
 	for await (const tweet of searchResults) {
 		let { created_at, text, id, author_id } = tweet;
+
+		let fragment = null;
+		const urls = tweet.entities?.urls ?? [];
+		for (const { expanded_url } of urls) {
+			const split = expanded_url.split('#:~:text', 2);
+			if (split.length == 2) {
+				fragment = '#:~:text' + split[1];
+				break;
+			}
+		}
+
 		created_at = new Date(created_at);
 		const author = await getAuthorInfo(author_id);
 		const link = `https://twitter.com/${author.username}/status/${id}`;
@@ -32,6 +45,7 @@ async function getTweets(query) {
 			link,
 			time: created_at,
 			text,
+			fragment,
 		});
 	}
 
@@ -51,5 +65,6 @@ app.get('/search/:query?', async (req, res) => {
 	});
 });
 
-app.listen(PORT);
-console.log('Listening on port', PORT);
+app.listen(PORT, () => {
+	console.log('Listening on port', PORT);
+});

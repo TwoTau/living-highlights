@@ -23,7 +23,7 @@
     ]
   },
   "devDependencies": {
-    "@living-papers/cli": "^0.0.5",
+    "@living-papers/cli": "*",
     "gh-pages": "^4.0.0",
     "mkdirp": "^1.0.4",
     "rimraf": "^3.0.2"

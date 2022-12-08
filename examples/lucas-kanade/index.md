@@ -30,15 +30,16 @@ output:
 
 
 ::: abstract
-This project adds social annotations via Tweets to Living Papers documents.
-
+This project adds reader "highlights" and social annotations to Living Papers documents.
 :::
 
-# Goals
+# Introduction
+
+## Goals
 
 todo
 
-# Related work
+## Related work
 
 todo: see references
 
@@ -113,63 +114,5 @@ It is not always possible to generate a text fragment that uniquely identifies a
 todo: explain Twitter imploding, how does that affect academic Twitter users?
 
 ~~~ bibliography
-@article{Barnea1972,
-  title={A Class of Algorithms for Fast Digital Image Registration},
-  author={Daniel I. Barnea and Harvey F. Silverman},
-  journal={IEEE Transactions on Computers},
-  year={1972},
-  volume={C-21},
-  pages={179-186},
-  doi={10.1109/TC.1972.5008923}
-}
 
-@article{Marr1979,
-  title={A computational theory of human stereo vision},
-  author={D. Marr and Tomaso A. Poggio},
-  journal={Proceedings of the Royal Society of London. Series B, Biological sciences},
-  year={1979},
-  volume={204 1156},
-  pages={301-328},
-  doi={10.1016/B978-1-4832-1446-7.50046-7}
-}
-
-@book{Dudewicz1976,
-  place={New York},
-  title={Introduction to statistics and probability},
-  publisher={Holt, Rinehart and Winston},
-  author={Dudewicz, Edward J.},
-  year={1976}
-}
-
-@inproceedings{Baker1980,
-  title={Edge Based Stereo Correlation},
-  author={Baker, H. Harlyn},
-  year={1980},
-  booktitle={DARPA Image Understanding Workshop},
-  pages={168-175}
-}
-
-@inproceedings{Gennery1979,
-  title={Stereo-Camera Calibration},
-  author={Gennery, Donald B},
-  year={1979},
-  booktitle={DARPA Image Understanding Workshop},
-  pages={101-107}
-}
-
-@inproceedings{Moravec1979,
-  title={Visual Mapping by a Robot Rover},
-  author={Hans P. Moravec},
-  booktitle={IJCAI},
-  year={1979},
-  doi={10.5555/1624861.1624997}
-}
-
-@inproceedings{Nilsson1971,
-  title={Problem-solving methods in artificial intelligence},
-  author={Nils J. Nilsson},
-  booktitle={McGraw-Hill computer science series},
-  year={1971},
-  doi={10.1145/1056578.1056583}
-}
 ~~~
