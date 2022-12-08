@@ -10,15 +10,33 @@ let lastOpenedTweet = 0;
 export default class AnnotationThread extends ArticleElement {
     constructor() {
         super();
-        document.addEventListener('keydown', this.keyDown);
+        document.addEventListener('mouseup', this.mouseUp);
     }
 
-    keyDown(event) {
+    mouseUp() {
         const selection = window.getSelection();
-        if (event.key !== 'h' && event.key !== 't' || !selection.toString()) {
-            return;
-        }
-        event.stopPropagation();
+        if (!selection.toString()) return;
+        const rect = selection.getRangeAt(0).getBoundingClientRect();
+        document.querySelector('annotation-thread').createTooltip(document.body.querySelector('article'),
+                 rect.x + rect.width / 2.0 + window.scrollX - 30, rect.y - 40 + window.scrollY, selection);
+    }
+
+    createTooltip(parent, x, y, selection) {
+        const tooltip = document.createElement('div');
+        tooltip.classList.add('anno-tooltip');
+        tooltip.style.top = `${y}px`;
+        tooltip.style.left = `${x}px`;
+        let tooltipContents = html`<div class="tooltip-tweet"><div class='icon-tweet'></div></div>
+                <div class="tooltip-highlight"><div class='icon-highlight'></div></div>`;
+        parent.insertBefore(tooltip, parent.firstChild)
+        render(tooltipContents, tooltip);
+        document.addEventListener('selectionchange', () => {tooltip.style.display = 'none';});
+        const thread = document.querySelector('annotation-thread');
+        tooltip.querySelector('.tooltip-tweet').addEventListener('mousedown', () => {thread.highlight(selection, true)});
+        tooltip.querySelector('.tooltip-highlight').addEventListener('mousedown', () => {thread.highlight(selection)});
+    }
+
+    highlight(selection, tweet=false) {
         let range = selection.getRangeAt(0);
 
         let selectedText = extractTextContent(range);
@@ -28,7 +46,10 @@ export default class AnnotationThread extends ArticleElement {
         if (marks.length === 0) return;
 
         marks.forEach(m => {addMarkEvents(m)});
-        createThread(this.querySelector('.anno-threads'), 'Test', selectedText, new Date().toString(), 'Test test test test test.');
+        createThread(this.querySelector('.anno-threads'), 'Username', selectedText,
+            new Date().toString(), 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            (tweet ? 'Tweet' : 'Highlight')
+        );
 
         function makeTweet() {
             // debounce
@@ -56,9 +77,7 @@ export default class AnnotationThread extends ArticleElement {
         // clear selection
         selection.removeAllRanges();
 
-        if (event.key === 't') {
-            makeTweet();
-        }
+        if (tweet) makeTweet();
     }
 
     openTab() {
@@ -97,7 +116,8 @@ export default class AnnotationThread extends ArticleElement {
     firstUpdated() {
         this.colorPicker = new ColorPickerControl({ container: this.querySelector('.anno-color'), theme:'light'});
         this.colorPicker.on('change', (color) => {
-            document.querySelector('article').style.setProperty('--highlight-color', `hsla(${color.h},${color.s}%,${color.v}%, ${color.a})`)
+            document.querySelector('article').style.setProperty('--highlight-color',
+                `hsla(${color.h},${color.s}%,${color.v}%, ${color.a})`);
             this.requestUpdate();
         });
         this.requestUpdate();
@@ -114,7 +134,9 @@ export default class AnnotationThread extends ArticleElement {
             <div class="anno-side-tray">
                 <div class='anno-color'></div>
                 <div class="anno-color-button" @click=${this.openColor}>+</div>
-                <div class='anno-button' @click=${this.openTab}><p style="transform: rotate(90deg) translate(-5px, -2px);margin: 0;">tweets</p></div>
+                <div class='anno-button' @click=${this.openTab}>
+                    <p style="transform: rotate(90deg) translate(-5px, -2px);margin: 0;">tweets</p>
+                </div>
             </div>
         </div>`
     }
@@ -140,7 +162,7 @@ function extractTextContent(range) {
     return text.slice(firstSpaceOffset, lastSpaceOffset);
 }
 
-function createThread (parent, username, threadText, threadDate, threadComment=null, threadType='Comment') {
+function createThread (parent, username, threadText, threadDate, threadComment=null, threadType='Highlight') {
     const thread = document.createElement('div');
     thread.classList.add('thread');
     let threadContents = html`

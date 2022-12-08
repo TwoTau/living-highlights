@@ -190,3 +190,43 @@ annotation-thread {
     padding: 2px;
     margin: 0 -2px;
 }
+
+.anno-tooltip {
+    display: flex;
+    position: absolute;
+    background-color: rgba(217, 214, 205, 1.0);
+    border: 1px solid rgba(38, 41, 50, 1.0);
+    border-radius: 2px;
+    z-index: 2;
+}
+
+.tooltip-tweet, .tooltip-highlight {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    transition: background-color 0.1s ease-out;
+}
+
+.tooltip-tweet {
+    border-right: 1px solid rgba(38, 41, 50, 1.0);
+}
+
+.icon-tweet, .icon-highlight {
+    width: 25px;
+    height: 25px;
+}
+
+.icon-tweet {
+    background-image: url(assets/twitterbird.svg);
+}
+
+.icon-highlight {
+    background-image: url(assets/highlighter.svg);
+}
+
+.tooltip-tweet:hover, .tooltip-highlight:hover {
+    background-color: rgba(150, 150, 150, 0.6);
+}
