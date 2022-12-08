@@ -1,47 +1,189 @@
+:root {
+    --highlight-color: #FAFA44;
+}
+
 .anno-tray {
     width: 420px;
     overflow-y: auto;
     height: 100vh;
     background-color: rgba(128, 128, 128, 0.3);
     backdrop-filter: blur(5px);
+    border-left: 1px solid rgba(38, 41, 50, 1.0);
+    box-sizing: border-box;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
 
+.anno-tray::-webkit-scrollbar {
+    display: none;
+}
+
+.anno-threads {
+    position: absolute;
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     flex-direction: column;
-    padding: 24px;
-    gap: 24px;
+    width: 100%;
+    height: auto;
+    top: 50px;
+    padding-top: 10px;
 }
 
-.thread-cont {
-    transition: height 900ms cubic-bezier(.05, .4, .25, .95);
-}
-
-.anno-thread {
-    background-color: whitesmoke;
-    border-radius: 4px;
+.thread-info {
+    display: flex;
+    flex-direction: row;
+    font-weight: bolder;
+    font-size: larger;
+    justify-content: space-between;
     padding: 10px;
-
-    max-height: 200px;
-	overflow-y: auto;
-    cursor: pointer;
+    border-bottom: 1px solid rgba(38, 41, 50, 1.0);
 }
 
-.anno-thread > p {
-    margin: 0;
+.thread-type {
+    width: 100px;
+    text-align: right;
+}
+
+.thread-text {
+    padding: 10px;
+    height: 100px;
+    overflow: auto;
+    font-style: italic;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.thread-text::-webkit-scrollbar {
+    display: none;
+}
+
+.thread-username {
+    width: 200px;
+    text-align: left;
+}
+
+.thread-username::before {
+    content: '@';
+}
+
+.thread-datetime {
+    display: flex;
+    justify-content: right;
+    align-items: right;
+    padding: 10px;
+    font-size: x-small;
+}
+
+.thread-comment {
+    min-height: 20px;
+    padding: 10px;
+}
+
+.thread-comment::before {
+    content: "- ";
+}
+
+.thread {
+    background-color: rgba(150, 150, 150, 0.6);
+    min-height: 150px;
+    width: 380px;
+    margin: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid rgba(38, 41, 50, 1.0);
+}
+
+.home {
+    display: flex;
+    width: 20%;
+    height: 100%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid rgba(38, 41, 50, 1.0);
+}
+
+.title {
+    display: flex;
+    width: 80%;
+    height: 100%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.top-nav {
+    position: sticky;
+    z-index: 1;
+    top: 0;
+    background-color: rgba(217, 214, 205, 1.0);
+    width: 100%;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    border-bottom: 1px solid rgba(38, 41, 50, 1.0);
+}
+
+.anno-side-tray {
+    position: absolute;
+    display: flex;
+    top: 0;
+	right: 420px;
+    width: 30px;
+    height: 300px;
+    overflow: hidden;
+    background-color: transparent;
+    border-bottom-left-radius: 30px;
+    transition: width 600ms cubic-bezier(.05, .4, .25, .95), height 600ms cubic-bezier(.05, .4, .25, .95);
+    justify-content: right;
 }
 
 .anno-button {
-    top: calc(50vh - 16px);
-	right: 360px;
-	position: absolute;
-	width: 150px;
-	background: #d9d9d9;
-	border-radius: 0 0 12px 12px;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    box-sizing: border-box;
+    top: 200px;
+    height: 100px;
+    width: 30px;
+    background: rgba(217, 214, 205, 1.0);
 	cursor: pointer;
-
     color: black;
 	font-size: 1.4em;
-	transform: rotate(90deg);
 	text-align: center;
+    z-index: 2;
+    border-bottom-left-radius: 30px;
+    border-left: 1px solid rgba(38, 41, 50, 1.0);
+    border-bottom: 1px solid rgba(38, 41, 50, 1.0);
+    transition: transform 600ms cubic-bezier(.05, .4, .25, .95);
+}
+
+.anno-color {
+    position: absolute;
+    left: 90px;
+    top: 104px;
+    height: 80px;
+}
+
+.anno-color-button {
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    background-color: rgba(217, 214, 205, 1.0);
+    box-sizing: border-box;
+    height: 31px;
+    width: 30px;
+    top: 169px;
+    font-weight: bolder;
+    border: 1px solid rgba(38, 41, 50, 1.0);
+    border-right: none;
+    transition: transform 600ms cubic-bezier(.05, .4, .25, .95);
+    z-index: 4;
 }
 
 .anno {
@@ -53,13 +195,13 @@
 }
 
 .annotation-highlight {
-    background: #ffff44;
+    background: var(--highlight-color);
     cursor: pointer;
-    transition: background 0.1s ease-out;
+    transition: filter 0.1s ease-out;
 }
 
-.hovered, .anno-thread:hover, .annotation-highlight:hover {
-    background: #ffdf2b;
+.hovered, .thread:hover, .annotation-highlight:hover {
+    filter: brightness(85%);
 }
 
 .annotation-highlight:hover {

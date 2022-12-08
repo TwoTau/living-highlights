@@ -1,7 +1,8 @@
-import { html } from 'lit';
+import { html, render } from 'lit';
 import { ArticleElement } from '@living-papers/components';
 import { generateFragment } from './fragment-generation-utils';
 import { markRange, getAllTextNodes } from './text-fragment-utils';
+import { ColorPickerControl } from './color-picker';
 
 // used for click debouncing
 let lastOpenedTweet = 0;
@@ -27,7 +28,7 @@ export default class AnnotationThread extends ArticleElement {
         if (marks.length === 0) return;
 
         marks.forEach(m => {addMarkEvents(m)});
-        this.querySelector('.anno-tray').appendChild(createThread(selectedText));
+        createThread(this.querySelector('.anno-threads'), 'Test', selectedText, new Date().toString(), 'Test test test test test.');
 
         function makeTweet() {
             // debounce
@@ -71,10 +72,50 @@ export default class AnnotationThread extends ArticleElement {
         }
     }
 
+    openColor() {
+        let annotation = this.querySelector('.anno-color');
+        let a = this.querySelector('.anno-button');
+        let b = this.querySelector('.anno-color-button');
+        let c = this.querySelector('.anno-side-tray');
+        if (!annotation.open) {
+            annotation.open = true;
+            a.style.transform = 'translate(0, 118px)';
+            b.style.transform = 'translate(0, 118px)';
+            c.style.height = `430px`;
+            c.style.width = `180px`;
+            b.textContent = '-';
+        } else {
+            annotation.open = false;
+            c.style.width = `30px`;
+            a.style.transform = 'translate(0, 0)';
+            b.style.transform = 'translate(0, 0)';
+            c.style.height = `300px`;
+            b.textContent = '+';
+        }
+    }
+
+    firstUpdated() {
+        this.colorPicker = new ColorPickerControl({ container: this.querySelector('.anno-color'), theme:'light'});
+        this.colorPicker.on('change', (color) => {
+            document.querySelector('article').style.setProperty('--highlight-color', `hsla(${color.h},${color.s}%,${color.v}%, ${color.a})`)
+            this.requestUpdate();
+        });
+        this.requestUpdate();
+    }
+
     render() {
         return html`<div class='anno'>
-            <div class='anno-tray'></div>
-            <div class='anno-button' @click=${this.openTab}>tweets</div>
+            <div class='anno-tray'>
+                <div class="top-nav">
+                    <div class="title"><h2 style="margin: 0;">Discussions<h3></div>
+                </div>
+                <div class="anno-threads"></div>
+            </div>
+            <div class="anno-side-tray">
+                <div class='anno-color'></div>
+                <div class="anno-color-button" @click=${this.openColor}>+</div>
+                <div class='anno-button' @click=${this.openTab}><p style="transform: rotate(90deg) translate(-5px, -2px);margin: 0;">tweets</p></div>
+            </div>
         </div>`
     }
 }
@@ -99,6 +140,23 @@ function extractTextContent(range) {
     return text.slice(firstSpaceOffset, lastSpaceOffset);
 }
 
+function createThread (parent, username, threadText, threadDate, threadComment=null, threadType='Comment') {
+    const thread = document.createElement('div');
+    thread.classList.add('thread');
+    let threadContents = html`
+                    <div class="thread-info">
+                        <div class="thread-username">${username}</div>
+                        <div class="thread-type">${threadType}</div>
+                    </div>
+                    <div class="thread-body">
+                        <div class="thread-text">${threadText}</div>
+                        <div class="thread-comment">${threadComment}</div>
+                    </div>
+                    <div class="thread-datetime">${threadDate}</div>`;
+    parent.insertBefore(thread, parent.firstChild)
+    render(threadContents, thread);
+}
+
 function createTweetIntentUrl(text, selection, url) {
     const result = generateFragment(selection);
 
@@ -118,20 +176,7 @@ function createTweetIntentUrl(text, selection, url) {
         url += '#:~:text=' + prefix + textStart + textEnd + suffix;
     }
 
-    text = `"${text}"\n`;
+    text = `"${text}"`;
 
     return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-}
-
-function createThread(text) {
-    let threadCont = document.createElement("div");
-    let annoThread = document.createElement("div");
-
-    threadCont.classList.add('thread-cont');
-    annoThread.classList.add('anno-thread');
-
-    annoThread.textContent = text;
-    threadCont.appendChild(annoThread);
-
-    return threadCont;
 }
