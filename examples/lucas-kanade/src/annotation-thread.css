@@ -1,20 +1,27 @@
-:root {
+annotation-thread {
     --highlight-color: #FAFA44;
+    --border-color: rgba(38, 41, 50, 1.0);
+    --ui-element-color: rgba(217, 214, 205, 1.0);
+    --tray-color: rgba(128, 128, 128, 0.3);
+    --thread-color: rgba(150, 150, 150, 0.6);
 }
 
 .anno-tray {
     width: 420px;
-    overflow-y: auto;
     height: 100vh;
-    background-color: rgba(128, 128, 128, 0.3);
+    background-color: var(--tray-color);
     backdrop-filter: blur(5px);
-    border-left: 1px solid rgba(38, 41, 50, 1.0);
+    border-left: 1px solid var(--border-color);
     box-sizing: border-box;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
 }
 
-.anno-tray::-webkit-scrollbar {
+.anno-tray, .thread-text {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow: auto;
+}
+
+.anno-tray::-webkit-scrollbar, .thread-text::-webkit-scrollbar {
     display: none;
 }
 
@@ -37,7 +44,7 @@
     font-size: larger;
     justify-content: space-between;
     padding: 10px;
-    border-bottom: 1px solid rgba(38, 41, 50, 1.0);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .thread-type {
@@ -48,14 +55,7 @@
 .thread-text {
     padding: 10px;
     height: 100px;
-    overflow: auto;
     font-style: italic;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-.thread-text::-webkit-scrollbar {
-    display: none;
 }
 
 .thread-username {
@@ -85,29 +85,19 @@
 }
 
 .thread {
-    background-color: rgba(150, 150, 150, 0.6);
+    background-color: var(--thread-color);
     min-height: 150px;
     width: 380px;
     margin: 10px;
     border-radius: 5px;
     overflow: hidden;
-    border: 1px solid rgba(38, 41, 50, 1.0);
-}
-
-.home {
-    display: flex;
-    width: 20%;
-    height: 100%;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    border-right: 1px solid rgba(38, 41, 50, 1.0);
+    border: 1px solid var(--border-color);
 }
 
 .title {
     display: flex;
-    width: 80%;
     height: 100%;
+    width: 80%;
     text-align: center;
     align-items: center;
     justify-content: center;
@@ -117,14 +107,14 @@
     position: sticky;
     z-index: 1;
     top: 0;
-    background-color: rgba(217, 214, 205, 1.0);
+    background-color:  var(--ui-element-color);
     width: 100%;
     height: 50px;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    border-bottom: 1px solid rgba(38, 41, 50, 1.0);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .anno-side-tray {
@@ -141,27 +131,6 @@
     justify-content: right;
 }
 
-.anno-button {
-    position: absolute;
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    box-sizing: border-box;
-    top: 200px;
-    height: 100px;
-    width: 30px;
-    background: rgba(217, 214, 205, 1.0);
-	cursor: pointer;
-    color: black;
-	font-size: 1.4em;
-	text-align: center;
-    z-index: 2;
-    border-bottom-left-radius: 30px;
-    border-left: 1px solid rgba(38, 41, 50, 1.0);
-    border-bottom: 1px solid rgba(38, 41, 50, 1.0);
-    transition: transform 600ms cubic-bezier(.05, .4, .25, .95);
-}
-
 .anno-color {
     position: absolute;
     left: 90px;
@@ -169,21 +138,34 @@
     height: 80px;
 }
 
-.anno-color-button {
+.anno-button, .anno-color-button {
     position: absolute;
+    display: flex;
     justify-content: center;
     align-items: center;
-    display: flex;
-    background-color: rgba(217, 214, 205, 1.0);
     box-sizing: border-box;
-    height: 31px;
     width: 30px;
+    background-color: var(--ui-element-color);
+    transition: transform 600ms cubic-bezier(.05, .4, .25, .95);
+}
+
+.anno-color-button {
+    height: 31px;
     top: 169px;
     font-weight: bolder;
-    border: 1px solid rgba(38, 41, 50, 1.0);
+    border: 1px solid var(--border-color);
     border-right: none;
-    transition: transform 600ms cubic-bezier(.05, .4, .25, .95);
-    z-index: 4;
+}
+
+.anno-button {
+    top: 200px;
+    height: 100px;
+	cursor: pointer;
+    color: black;
+	font-size: 1.4em;
+    border-bottom-left-radius: 30px;
+    border-left: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .anno {
