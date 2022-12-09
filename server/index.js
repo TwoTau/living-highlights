@@ -2,9 +2,14 @@ import { TwitterApi } from 'twitter-api-v2';
 import express from 'express';
 import cors from 'cors';
 
-const PORT = +(process.env.PORT || 2976);
+const PORT = +(process.env.PORT || 3000);
 
-const TOKEN = 'AAAAAAAAAAAAAAAAAAAAAE6OiwEAAAAAeYbl4zqLU6q91RVW8ZI%2FPNekttw%3DZ2w6UUuJ8VfAiUdsWDVRzVl9ngiAd6h1f2ePC9DYwMFP7n1WxA';
+const TOKEN = process.env.TWITTER_API_TOKEN;
+
+if (!TOKEN) {
+	console.error("Error: No TWITTER_API_TOKEN environment variable defined.");
+	process.exit(1);
+}
 
 const app = express();
 app.use(cors());
@@ -58,7 +63,7 @@ async function getTweets(query) {
 }
 
 // For example, go to
-// http://localhost:2976/search/vishald.com
+// http://localhost:3000/search/vishald.com
 
 app.get('/search/:query?', async (req, res) => {
 	const query = req.params.query;

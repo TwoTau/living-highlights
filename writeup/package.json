@@ -10,8 +10,8 @@
     "build": "lpub -o build --tempDir='.temp' index.md",
     "prewatch": "npm run assets",
     "watch": "lpub -o build --tempDir='.temp' --watch index.md",
-    "predeploy": "rimraf ../../docs",
-    "deploy": "cp build ../../docs -r"
+    "predeploy": "rimraf ../docs",
+    "deploy": "cp build ../docs -r"
   },
   "living-papers": {
     "components": [
